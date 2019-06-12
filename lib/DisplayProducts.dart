@@ -30,7 +30,7 @@ class ProductItem extends StatelessWidget {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: <Widget>[
-                      Text(
+                  Text(
                     product.name,
                     style: TextStyle(fontSize: 16.0),
                     overflow: TextOverflow.clip,
@@ -70,32 +70,29 @@ class DisplayProductsState extends State<DisplayProducts> {
 
   Map toJson(String product) => {'product': product};
 
-
   @override
   void initState() {
     super.initState();
     _fetchProducts();
   }
 
-
   _fetchProducts() async {
     setState(() {
       isLoading = true;
     });
 
-    final response  = await http.get('http://192.168.42.195:8000/');
-    if(response.statusCode == 200) {
+    final response = await http.get('http://192.168.42.195:8000/');
+    if (response.statusCode == 200) {
       setState(() {
         isLoading = false;
         widget.products.clear();
         final jsonResponse = json.decode(response.body);
-        ProductDetailsList productDetailsList = ProductDetailsList.fromJson(jsonResponse);
+        ProductDetailsList productDetailsList =
+            ProductDetailsList.fromJson(jsonResponse);
         widget.products.addAll(productDetailsList.products);
       });
-
     }
   }
-
 
   @override
   Widget build(BuildContext context) {
@@ -116,13 +113,11 @@ class DisplayProductsState extends State<DisplayProducts> {
         child: Icon(Icons.add),
         tooltip: 'Add product',
         onPressed: () {
-          Navigator.push(
-            context,
-            MaterialPageRoute(builder: (context) => AddProduct())
-          ).then((value) {
+          Navigator.push(context,
+                  MaterialPageRoute(builder: (context) => AddProduct()))
+              .then((value) {
             _fetchProducts();
-          }
-          );
+          });
         },
       ),
     );
