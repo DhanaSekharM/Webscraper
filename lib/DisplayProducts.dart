@@ -30,10 +30,14 @@ class ProductItem extends StatelessWidget {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: <Widget>[
-                  Text(
-                    product.name,
-                    style: TextStyle(fontSize: 16.0),
-                    overflow: TextOverflow.clip,
+                  Container(
+                    width: 220.0,
+                    child: Text(
+                      product.name,
+                      style: TextStyle(fontSize: 16.0),
+                      overflow: TextOverflow.ellipsis
+
+                    ),
                   ),
                   const Padding(padding: EdgeInsets.only(top: 4.0)),
                   Text(
@@ -64,7 +68,7 @@ class DisplayProducts extends StatefulWidget {
   State<StatefulWidget> createState() => DisplayProductsState();
 }
 
-class DisplayProductsState extends State<DisplayProducts> {
+class DisplayProductsState extends State<DisplayProducts> with WidgetsBindingObserver{
   String newProduct;
   bool isLoading = false;
 
@@ -73,7 +77,18 @@ class DisplayProductsState extends State<DisplayProducts> {
   @override
   void initState() {
     super.initState();
+    WidgetsBinding.instance.addObserver(this);
     _fetchProducts();
+  }
+
+
+  @override
+  void didChangeAppLifecycleState(AppLifecycleState state) {
+    super.didChangeAppLifecycleState(state);
+    print('State $state');
+    if(state == AppLifecycleState.resumed) {
+      _fetchProducts();
+    }
   }
 
   _fetchProducts() async {
@@ -96,8 +111,19 @@ class DisplayProductsState extends State<DisplayProducts> {
 
   @override
   Widget build(BuildContext context) {
-    print(widget.products.length);
     return Scaffold(
+      appBar: AppBar(
+        title: Text('Products'),
+        actions: <Widget>[
+          IconButton(
+            icon: Icon(Icons.refresh),
+            onPressed: () {
+              _fetchProducts();
+            },
+            tooltip: 'Refresh',
+          )
+        ],
+      ),
       body: isLoading
           ? Center(
               child: CircularProgressIndicator(),
@@ -110,16 +136,14 @@ class DisplayProductsState extends State<DisplayProducts> {
                 );
               }),
       floatingActionButton: FloatingActionButton(
-        child: Icon(Icons.add),
-        tooltip: 'Add product',
+        child: Icon(Icons.add) ,
         onPressed: () {
-          Navigator.push(context,
-                  MaterialPageRoute(builder: (context) => AddProduct()))
-              .then((value) {
-            _fetchProducts();
-          });
+          Navigator.push(
+            context,
+            MaterialPageRoute(builder: (context) => AddProduct())
+          );
         },
-      ),
+      )
     );
   }
 }

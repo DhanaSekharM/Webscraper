@@ -19,7 +19,25 @@ class AddProductState extends State<AddProduct> {
   final String url = 'http://192.168.42.195:8000/';
   String productUrl;
 
-  final mTextController = TextEditingController();
+  final _textController = TextEditingController();
+  Widget clearIcon = Container();
+
+  @override
+  void initState() {
+    super.initState();
+    _textController.addListener(() {
+      if (_textController.text.length > 0) {
+        setState(() {
+          clearIcon = Icon(Icons.clear);
+        });
+      }
+      if (_textController.text.length == 0) {
+        setState(() {
+          clearIcon = Container();
+        });
+      }
+    });
+  }
 
   _fetchData() async {
     setState(() {
@@ -32,7 +50,7 @@ class AddProductState extends State<AddProduct> {
     });
 
     final response = await http.post(url, body: jsonBody);
-    if(response.statusCode == 200) {
+    if (response.statusCode == 200) {
       setState(() {
         fetchingData = false;
         product = ProductDetails.fromJson(json.decode(response.body));
@@ -48,41 +66,50 @@ class AddProductState extends State<AddProduct> {
       ),
       body: Column(
         children: <Widget>[
-          TextField(
-            controller: mTextController,
-            decoration: InputDecoration(
-              hintText: 'Enter product url',
-              suffixIcon:
-                  IconButton(
-                      icon: Icon(Icons.search),
-                      onPressed: () {
-                        productUrl = mTextController.text;
-                        _fetchData();
-                      }
-                  ),
-            ),
-          ),
+          buildTextField(),
           buildContentUi(),
         ],
       ),
     );
   }
 
+  TextField buildTextField() {
+    return TextField(
+      autofocus: true,
+      textInputAction: TextInputAction.search,
+      controller: _textController,
+      onSubmitted: (String value) {
+        productUrl = _textController.text;
+        _fetchData();
+      },
+      decoration: InputDecoration(
+        border: OutlineInputBorder(),
+        contentPadding: EdgeInsets.all(4.0),
+        hintText: 'Enter product url',
+        hintStyle: TextStyle(),
+        suffixIcon: IconButton(
+            icon: clearIcon,
+            onPressed: () {
+              _textController.clear();
+            }),
+      ),
+    );
+  }
+
   Widget buildContentUi() {
     if (fetchingData && hasMadeARequest) {
-      return Container(
-        child: Center(
-        child: CircularProgressIndicator(),
-      ));
+      return Expanded(
+        child: Center(child: CircularProgressIndicator()),
+      );
     }
 
     if (!fetchingData) {
       return Column(
         children: <Widget>[
-          Container(
-            height: 250.0,
-            decoration: BoxDecoration(
-              color: Colors.red,
+          Center(
+            child: new Image.network(
+              product.imageUrl,
+              fit: BoxFit.fill,
             ),
           ),
           Container(
@@ -92,18 +119,15 @@ class AddProductState extends State<AddProduct> {
                 style: TextStyle(fontSize: 18.0),
               )),
           Container(
-            margin: const EdgeInsets.all(4.0),
-            child: Text(
-              product.currentPrice,
-              style: TextStyle(fontSize: 12.0),
-            )
-          )
+              margin: const EdgeInsets.all(4.0),
+              child: Text(
+                product.currentPrice,
+                style: TextStyle(fontSize: 12.0),
+              ))
         ],
       );
     }
 
-    return Container(
-
-    );
+    return Container();
   }
 }

@@ -17,17 +17,7 @@ class HomePage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     firebaseCloudMessaging_Listeners();
-    return Scaffold(
-      appBar: AppBar(
-        title: Text('Products'),
-      ),
-//      body: DisplayProducts(products: new List<ProductDetails>()),
-//      floatingActionButton: FloatingActionButton(
-//        child: Icon(Icons.add),
-//        tooltip: 'Add product',
-//        onPressed: null,
-//      ),
-    );
+    return DisplayProducts(products: new List<ProductDetails>());
   }
 
   void firebaseCloudMessaging_Listeners() {

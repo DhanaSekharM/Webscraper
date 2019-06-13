@@ -19,15 +19,17 @@ class ProductDetails {
   final String productUrl;
   final String currentPrice;
   final String allTimeLow;
+  final String imageUrl;
 
-  const ProductDetails({this.productUrl, this.allTimeLow, this.name, this.currentPrice});
+  const ProductDetails({this.productUrl, this.allTimeLow, this.name, this.currentPrice, this.imageUrl});
 
   factory ProductDetails.fromJson(Map<String, dynamic> parsedJson) {
     return ProductDetails(
         name: parsedJson['product_name'],
         productUrl: parsedJson['product_json'],
         currentPrice: parsedJson['product_price'],
-        allTimeLow: parsedJson['all_time_low']
+        allTimeLow: parsedJson['all_time_low'],
+        imageUrl: parsedJson['image_url']
     );
   }
 }
