@@ -22,7 +22,9 @@ class ProductItem extends StatelessWidget {
               height: 128.0,
               width: 100.0,
               margin: const EdgeInsets.all(8.0),
-              decoration: BoxDecoration(color: Colors.red),
+              child: new Image.network(
+                product.imageUrl
+              ),
             ),
             Container(
               margin: const EdgeInsets.only(top: 8.0),
@@ -34,20 +36,21 @@ class ProductItem extends StatelessWidget {
                     width: 220.0,
                     child: Text(
                       product.name,
+                      maxLines: 2,
                       style: TextStyle(fontSize: 16.0),
                       overflow: TextOverflow.ellipsis
 
                     ),
                   ),
-                  const Padding(padding: EdgeInsets.only(top: 4.0)),
+                  const Padding(padding: EdgeInsets.only(top: 8.0)),
                   Text(
-                    product.currentPrice,
-                    style: TextStyle(fontSize: 10.0),
+                    'Current price: ${product.currentPrice}',
+                    style: TextStyle(fontSize: 12.0, fontWeight: FontWeight.bold),
                   ),
-                  const Padding(padding: EdgeInsets.only(top: 4.0)),
+                  const Padding(padding: EdgeInsets.only(top: 8.0)),
                   Text(
-                    'Rating',
-                    style: TextStyle(fontSize: 10.0),
+                    'All time low: ${product.allTimeLow}',
+                    style: TextStyle(fontSize: 12.0, fontWeight: FontWeight.bold),
                   )
                 ],
               ),

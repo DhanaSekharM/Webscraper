@@ -104,25 +104,31 @@ class AddProductState extends State<AddProduct> {
     }
 
     if (!fetchingData) {
+
       return Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
         children: <Widget>[
-          Center(
-            child: new Image.network(
-              product.imageUrl,
-              fit: BoxFit.fill,
+          Container(
+            margin: const EdgeInsets.all(12.0),
+            height: 200.0,
+            child: Center(
+              child: new Image.network(
+                product.imageUrl.replaceFirst('128/128', '400/400'),
+                fit: BoxFit.fitHeight,
+              ),
             ),
           ),
           Container(
-              margin: const EdgeInsets.all(4.0),
+              margin: const EdgeInsets.only(left: 8.0, top: 4.0, right: 4.0, bottom: 4.0),
               child: Text(
                 product.name,
                 style: TextStyle(fontSize: 18.0),
               )),
           Container(
-              margin: const EdgeInsets.all(4.0),
+              margin: const EdgeInsets.only(top: 12.0, left: 8.0),
               child: Text(
-                product.currentPrice,
-                style: TextStyle(fontSize: 12.0),
+                'Current price: ${product.currentPrice}',
+                style: TextStyle(fontSize: 18.0, fontWeight: FontWeight.bold),
               ))
         ],
       );
