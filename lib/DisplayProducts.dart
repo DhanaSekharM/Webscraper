@@ -6,62 +6,6 @@ import 'package:http/http.dart' as http;
 import 'AddProduct.dart';
 import 'ProductPodo.dart';
 
-class ProductItem extends StatelessWidget {
-  final ProductDetails product;
-
-  const ProductItem({this.product});
-
-  @override
-  Widget build(BuildContext context) {
-    return SizedBox(
-      height: 128.0,
-      child: Card(
-        child: Row(
-          children: <Widget>[
-            Container(
-              height: 128.0,
-              width: 100.0,
-              margin: const EdgeInsets.all(8.0),
-              child: new Image.network(
-                product.imageUrl
-              ),
-            ),
-            Container(
-              margin: const EdgeInsets.only(top: 8.0),
-              padding: const EdgeInsets.all(4.0),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: <Widget>[
-                  Container(
-                    width: 220.0,
-                    child: Text(
-                      product.name,
-                      maxLines: 2,
-                      style: TextStyle(fontSize: 16.0),
-                      overflow: TextOverflow.ellipsis
-
-                    ),
-                  ),
-                  const Padding(padding: EdgeInsets.only(top: 8.0)),
-                  Text(
-                    'Current price: ${product.currentPrice}',
-                    style: TextStyle(fontSize: 12.0, fontWeight: FontWeight.bold),
-                  ),
-                  const Padding(padding: EdgeInsets.only(top: 8.0)),
-                  Text(
-                    'All time low: ${product.allTimeLow}',
-                    style: TextStyle(fontSize: 12.0, fontWeight: FontWeight.bold),
-                  )
-                ],
-              ),
-            ),
-          ],
-        ),
-      ),
-    );
-  }
-}
-
 class DisplayProducts extends StatefulWidget {
   final List<ProductDetails> products;
 
@@ -134,8 +78,21 @@ class DisplayProductsState extends State<DisplayProducts> with WidgetsBindingObs
           : ListView.builder(
               itemCount: widget.products == null ? 0 : widget.products.length,
               itemBuilder: (context, i) {
-                return ProductItem(
-                  product: widget.products[i],
+                return Dismissible(
+                  key: Key(widget.products[i].toString() + widget.products.length.toString()),
+                  onDismissed: (direction) {
+                    print(i);
+
+                    dismissCard(i);
+
+                    Scaffold.of(context).showSnackBar(
+                      SnackBar(content: Text('Dismissed'))
+                    );
+                  },
+                  background: Container(
+                    color: Colors.red,
+                  ),
+                  child: buildCard(widget.products[i]),
                 );
               }),
       floatingActionButton: FloatingActionButton(
@@ -148,5 +105,61 @@ class DisplayProductsState extends State<DisplayProducts> with WidgetsBindingObs
         },
       )
     );
+  }
+
+  SizedBox buildCard(ProductDetails product) {
+    return SizedBox(
+      height: 128.0,
+      child: Card(
+        child: Row(
+          children: <Widget>[
+            Container(
+              height: 128.0,
+              width: 100.0,
+              margin: const EdgeInsets.all(8.0),
+              child: new Image.network(
+                  product.imageUrl
+              ),
+            ),
+            Container(
+              margin: const EdgeInsets.only(top: 8.0),
+              padding: const EdgeInsets.all(4.0),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: <Widget>[
+                  Container(
+                    width: 220.0,
+                    child: Text(
+                        product.name,
+                        maxLines: 2,
+                        style: TextStyle(fontSize: 16.0),
+                        overflow: TextOverflow.ellipsis
+
+                    ),
+                  ),
+                  const Padding(padding: EdgeInsets.only(top: 8.0)),
+                  Text(
+                    'Current price: ${product.currentPrice}',
+                    style: TextStyle(fontSize: 12.0, fontWeight: FontWeight.bold),
+                  ),
+                  const Padding(padding: EdgeInsets.only(top: 8.0)),
+                  Text(
+                    'All time low: ${product.allTimeLow}',
+                    style: TextStyle(fontSize: 12.0, fontWeight: FontWeight.bold),
+                  )
+                ],
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  void dismissCard(int i) {
+    setState(() {
+      widget.products.removeAt(i);
+      print(widget.products.length);
+    });
   }
 }
