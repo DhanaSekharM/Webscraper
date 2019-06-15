@@ -2,6 +2,9 @@ import 'package:flutter/material.dart';
 import 'dart:async';
 import 'dart:convert';
 import 'package:http/http.dart' as http;
+//import 'package:flutter_appavailability/flutter_appavailability.dart';
+import 'package:android_intent/android_intent.dart';
+import 'package:url_launcher/url_launcher.dart';
 
 import 'AddProduct.dart';
 import 'ProductPodo.dart';
@@ -18,6 +21,7 @@ class DisplayProducts extends StatefulWidget {
 class DisplayProductsState extends State<DisplayProducts> with WidgetsBindingObserver{
   String newProduct;
   bool isLoading = false;
+  String url = 'http://192.168.42.195:8000/';
 
   Map toJson(String product) => {'product': product};
 
@@ -43,7 +47,7 @@ class DisplayProductsState extends State<DisplayProducts> with WidgetsBindingObs
       isLoading = true;
     });
 
-    final response = await http.get('http://192.168.42.195:8000/');
+    final response = await http.get(url);
     if (response.statusCode == 200) {
       setState(() {
         isLoading = false;
@@ -54,6 +58,18 @@ class DisplayProductsState extends State<DisplayProducts> with WidgetsBindingObs
         widget.products.addAll(productDetailsList.products);
       });
     }
+  }
+
+  _deleteFromDatabase(ProductDetails product) async {
+
+    final response  = await http.delete(url, )
+
+  }
+
+  _launchUrl(String productUrl) async{
+    print(productUrl);
+    await launch(productUrl);
+
   }
 
   @override
@@ -78,21 +94,33 @@ class DisplayProductsState extends State<DisplayProducts> with WidgetsBindingObs
           : ListView.builder(
               itemCount: widget.products == null ? 0 : widget.products.length,
               itemBuilder: (context, i) {
-                return Dismissible(
-                  key: Key(widget.products[i].toString() + widget.products.length.toString()),
-                  onDismissed: (direction) {
-                    print(i);
-
-                    dismissCard(i);
-
-                    Scaffold.of(context).showSnackBar(
-                      SnackBar(content: Text('Dismissed'))
-                    );
+                return GestureDetector(
+                  onTap: () {
+                    _launchUrl(widget.products[i].productUrl);
+//                    Scaffold.of(context).showSnackBar(SnackBar(content: Text(widget.products[i].productUrl)));
                   },
-                  background: Container(
-                    color: Colors.red,
+                  child: Dismissible(
+                    key: Key(widget.products[i].toString() + widget.products.length.toString()),
+                    onDismissed: (direction) {
+                      print(i);
+                      _deleteFromDatabase(widget.products[i]);
+                      dismissCard(i);
+
+                      Scaffold.of(context).showSnackBar(
+                        SnackBar(content: Text('Dismissed'))
+                      );
+                    },
+                    background: Container(
+                      padding: EdgeInsets.only(left: 8.0),
+                      alignment: Alignment.centerLeft,
+                      child: Icon(
+                        Icons.delete,
+                        color: Colors.black,
+                      ),
+                      color: Colors.red,
+                    ),
+                    child: buildCard(widget.products[i], i),
                   ),
-                  child: buildCard(widget.products[i]),
                 );
               }),
       floatingActionButton: FloatingActionButton(
@@ -107,9 +135,9 @@ class DisplayProductsState extends State<DisplayProducts> with WidgetsBindingObs
     );
   }
 
-  SizedBox buildCard(ProductDetails product) {
+  SizedBox buildCard(ProductDetails product, int i) {
     return SizedBox(
-      height: 128.0,
+      height: 140.0,
       child: Card(
         child: Row(
           children: <Widget>[
@@ -146,7 +174,12 @@ class DisplayProductsState extends State<DisplayProducts> with WidgetsBindingObs
                   Text(
                     'All time low: ${product.allTimeLow}',
                     style: TextStyle(fontSize: 12.0, fontWeight: FontWeight.bold),
-                  )
+                  ),
+                  Container(
+                      alignment: Alignment.bottomRight,
+                      child: Icon(Icons.open_in_new, )
+                  ),
+                  Padding(padding: EdgeInsets.only(bottom: 4.0,))
                 ],
               ),
             ),
@@ -162,4 +195,6 @@ class DisplayProductsState extends State<DisplayProducts> with WidgetsBindingObs
       print(widget.products.length);
     });
   }
+
+
 }

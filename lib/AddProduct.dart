@@ -39,7 +39,7 @@ class AddProductState extends State<AddProduct> {
     });
   }
 
-  _fetchData() async {
+  _makeRequest() async {
     setState(() {
       fetchingData = true;
       hasMadeARequest = true;
@@ -80,7 +80,7 @@ class AddProductState extends State<AddProduct> {
       controller: _textController,
       onSubmitted: (String value) {
         productUrl = _textController.text;
-        _fetchData();
+        _makeRequest();
       },
       decoration: InputDecoration(
         border: OutlineInputBorder(),
