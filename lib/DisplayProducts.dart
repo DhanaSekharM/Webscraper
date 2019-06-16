@@ -19,9 +19,10 @@ class DisplayProducts extends StatefulWidget {
 }
 
 class DisplayProductsState extends State<DisplayProducts> with WidgetsBindingObserver{
-  String newProduct;
   bool isLoading = false;
-  String url = 'http://192.168.42.195:8000/';
+  String getAndPostUrl = 'http://192.168.42.195:8000/';
+  String deleteUrl = 'http://192.168.42.195:8000/delete/';
+  ProductDetails tempProduct;
 
   Map toJson(String product) => {'product': product};
 
@@ -38,7 +39,7 @@ class DisplayProductsState extends State<DisplayProducts> with WidgetsBindingObs
     super.didChangeAppLifecycleState(state);
     print('State $state');
     if(state == AppLifecycleState.resumed) {
-      _fetchProducts();
+//      _fetchProducts();
     }
   }
 
@@ -47,7 +48,7 @@ class DisplayProductsState extends State<DisplayProducts> with WidgetsBindingObs
       isLoading = true;
     });
 
-    final response = await http.get(url);
+    final response = await http.get(getAndPostUrl);
     if (response.statusCode == 200) {
       setState(() {
         isLoading = false;
@@ -62,7 +63,7 @@ class DisplayProductsState extends State<DisplayProducts> with WidgetsBindingObs
 
   _deleteFromDatabase(ProductDetails product) async {
 
-    final response  = await http.delete(url, )
+    final response  = await http.delete('$deleteUrl${product.id}/');
 
   }
 
@@ -103,12 +104,29 @@ class DisplayProductsState extends State<DisplayProducts> with WidgetsBindingObs
                     key: Key(widget.products[i].toString() + widget.products.length.toString()),
                     onDismissed: (direction) {
                       print(i);
-                      _deleteFromDatabase(widget.products[i]);
+//                      _deleteFromDatabase(widget.products[i]);
                       dismissCard(i);
 
                       Scaffold.of(context).showSnackBar(
-                        SnackBar(content: Text('Dismissed'))
-                      );
+                        SnackBar(
+                          content: Text('Product deleted:('),
+                          action: SnackBarAction(
+                            label: 'Undo',
+                            onPressed: () {
+                              print('Undo');
+                            },
+                          ),
+                        )
+                      ).closed.then((reason) {
+                        if(reason == SnackBarClosedReason.swipe || reason == SnackBarClosedReason.timeout) {
+                          _deleteFromDatabase(tempProduct);
+                        }
+                        if(reason == SnackBarClosedReason.action) {
+                          setState(() {
+                            widget.products.insert(i, tempProduct);
+                          });
+                        }
+                      });
                     },
                     background: Container(
                       padding: EdgeInsets.only(left: 8.0),
@@ -191,6 +209,7 @@ class DisplayProductsState extends State<DisplayProducts> with WidgetsBindingObs
 
   void dismissCard(int i) {
     setState(() {
+      tempProduct = widget.products[i];
       widget.products.removeAt(i);
       print(widget.products.length);
     });
